@@ -8,7 +8,7 @@ Crawls the web mining for phone numbers and metadata of people who are intereste
 
 Checkout the app
 
-    $ git checkout https://github.com/dwilkie/dating_crawler
+    $ git checkout https://github.com/dwilkie/dating_crawler.git
 
 And then execute:
 

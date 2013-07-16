@@ -1,12 +1,14 @@
 source 'https://rubygems.org'
 ruby "2.0.0"
 
-gem 'phone_number_miner', :path => "/home/dave/work/contrib/phone_number_miner"
+gem 'phone_number_miner', :git => "git://github.com/dwilkie/phone_number_miner.git"
 gem 'rake'
+gem 'aws-sdk', '~> 1.0'
 
 group :test do
   gem 'guard-rspec'
   gem 'rspec'
-  gem 'fakeweb'
+  gem 'webmock'
   gem 'vcr', :git => 'git://github.com/myronmarston/vcr.git'
+  gem 'timecop'
 end

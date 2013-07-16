@@ -1,0 +1,130 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: <%= angkor_thom[:page_indexes_url] %>
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Content-Type:
+      - ''
+      Accept-Encoding:
+      - ''
+      User-Agent:
+      - aws-sdk-ruby/1.11.1 ruby/2.0.0 i686-linux
+      Date:
+      - Tue, 16 Jul 2013 13:09:50 GMT
+      Authorization:
+      - AWS aws_access_key_id:aws_secret_access_key=
+      Accept:
+      - '*/*'
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      X-Amz-Request-Id:
+      - 14A7182823078F55
+      X-Amz-Id-2:
+      - QqWATVUashYv3M0XG0BpFTAZTYYAz6UzH9hTZvL9RmUWgJffCJV1xuxwOHS+TYFT
+      Content-Type:
+      - application/xml
+      Transfer-Encoding:
+      - chunked
+      Date:
+      - Tue, 16 Jul 2013 13:09:52 GMT
+      Server:
+      - AmazonS3
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version:
+  recorded_at: Tue, 16 Jul 2013 13:09:52 GMT
+- request:
+    method: put
+    uri: <%= angkor_thom[:page_indexes_url] %>
+    body:
+      encoding: ASCII-8BIT
+      string: <%= angkor_thom[:new_page_indexes].to_json %>
+    headers:
+      Content-Type:
+      - ''
+      Accept-Encoding:
+      - ''
+      Content-Length:
+      - '30'
+      User-Agent:
+      - aws-sdk-ruby/1.11.1 ruby/2.0.0 i686-linux
+      Date:
+      - Tue, 16 Jul 2013 13:21:35 GMT
+      Authorization:
+      - AWS aws_access_key_id:aws_secret_access_key=
+      Accept:
+      - '*/*'
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Amz-Id-2:
+      - 1/E/O3ivZlLptqCiCCRF9UqVcdfwMR3t4+7SLvZ5gYlqU2cZ3E3HG5oJ7ms0IKt6
+      X-Amz-Request-Id:
+      - DF7C8AEBBB242665
+      Date:
+      - Tue, 16 Jul 2013 13:21:37 GMT
+      Etag:
+      - '"a11722d5dcfd7785dd37512c62477b43"'
+      Content-Length:
+      - '0'
+      Server:
+      - AmazonS3
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version:
+  recorded_at: Tue, 16 Jul 2013 13:21:37 GMT
+- request:
+    method: put
+    uri: <%= angkor_thom[:data_url] %>
+    body:
+      encoding: ASCII-8BIT
+      string: <%= angkor_thom[:data].to_json %>
+    headers:
+      Content-Type:
+      - ''
+      Accept-Encoding:
+      - ''
+      Content-Length:
+      - '156'
+      User-Agent:
+      - aws-sdk-ruby/1.11.1 ruby/2.0.0 i686-linux
+      Date:
+      - Tue, 16 Jul 2013 14:49:00 GMT
+      Authorization:
+      - AWS aws_access_key_id:aws_secret_access_key=
+      Accept:
+      - '*/*'
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Amz-Id-2:
+      - 7SjpjzgT8SLJSt4l49KqzN78a2ZG/FfinXvG00PmfsS6zfRy5um/rv8eryAHJGBP
+      X-Amz-Request-Id:
+      - E1373416B33461F3
+      Date:
+      - Tue, 16 Jul 2013 14:49:02 GMT
+      Etag:
+      - '"699a742fe13862bbc3301a67db1e967a"'
+      Content-Length:
+      - '0'
+      Server:
+      - AmazonS3
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version:
+  recorded_at: Tue, 16 Jul 2013 14:49:01 GMT
+recorded_with: VCR 2.3.0

@@ -8,7 +8,7 @@ PATH
   remote: /home/dave/work/contrib/phone_number_miner
   specs:
     phone_number_miner (0.0.1)
-      httparty
+      google-transliterate
       mechanize
 
 GEM
@@ -18,6 +18,8 @@ GEM
     domain_name (0.5.12)
       unf (>= 0.0.5, < 1.0.0)
     fakeweb (1.3.0)
+    google-transliterate (0.0.1)
+      httparty
     http-cookie (1.0.1)
       domain_name (~> 0.5)
     httparty (0.11.0)

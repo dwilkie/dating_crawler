@@ -5,7 +5,9 @@ class DataFetcher
   DEFAULT_ANGKOR_THOM_PAGE_INDEX_PATH = "dating_crawler/angkor_thom_page_indexes.json"
   DEFAULT_DATA_DIRECTORY = "dating_crawler/data"
 
-  attr_accessor :aws_access_key_id, :aws_secret_access_key, :aws_s3_bucket, :angkor_thom_page_index_path, :data_directory
+  attr_accessor :aws_access_key_id, :aws_secret_access_key,
+                :aws_s3_bucket, :angkor_thom_page_index_path,
+                :data_directory, :resque_queue, :resque_worker
 
   def initialize(options = {})
     self.aws_access_key_id = options[:aws_access_key_id] || ENV["AWS_ACCESS_KEY_ID"]
@@ -13,11 +15,14 @@ class DataFetcher
     self.aws_s3_bucket = options[:aws_s3_bucket] || ENV["AWS_S3_BUCKET"]
     self.data_directory = options[:data_directory] ||= DEFAULT_DATA_DIRECTORY
     self.angkor_thom_page_index_path = options[:angkor_thom_page_index_path] || DEFAULT_ANGKOR_THOM_PAGE_INDEX_PATH
+    self.resque_queue = options[:resque_queue] || ENV["RESQUE_QUEUE_NAME"]
+    self.resque_worker = options[:resque_worker] || ENV["RESQUE_WORKER"]
   end
 
   def fetch!
     suggested_filename, results = fetch_angkor_thom!
     results_file(suggested_filename).write(results.to_json)
+    Resque::Job.create(resque_queue, "UserImporter", results) if resque_queue && resque_worker
   end
 
   private

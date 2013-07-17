@@ -87,16 +87,28 @@ describe DataFetcher do
       Timecop.return
     end
 
-    it "should upload the results and angkor thom page indexes to the configured S3 bucket" do
+    it "should upload the angkor thom page indexes to he configured S3 bucket" do
       with_vcr { subject.fetch! }
 
       request(2, :body).should == sample[:angkor_thom][:new_page_indexes]
       request(2, :url).should == asserted_url(assertions[:angkor_thom][:default_page_indexes_path])
       request(2, :method).should == :put
+    end
+
+    it "should upload the results to the configured S3 bucket" do
+      with_vcr { subject.fetch! }
 
       request(3, :body).should == sample[:angkor_thom][:data]
       request(3, :url).should == asserted_url(asserted_angkor_thom_data_path)
       request(3, :method).should == :put
+    end
+
+    context "given a resque queue and worker is configured" do
+      it "should create a job with the results" do
+        with_vcr { subject.fetch! }
+
+        pending "assert job is queued"
+      end
     end
 
     context "given there is a file containing angkor thom page indexes on the configured S3 bucket" do

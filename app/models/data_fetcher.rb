@@ -16,7 +16,7 @@ class DataFetcher
     self.aws_s3_bucket = options[:aws_s3_bucket] || ENV["AWS_S3_BUCKET"]
     self.data_directory = options[:data_directory] ||= DEFAULT_DATA_DIRECTORY
     self.angkor_thom_page_index_path = options[:angkor_thom_page_index_path] || DEFAULT_ANGKOR_THOM_PAGE_INDEX_PATH
-    self.resque_queue = options[:resque_queue] || ENV["RESQUE_QUEUE_NAME"]
+    self.resque_queue = options[:resque_queue] || ENV["RESQUE_QUEUE"]
     self.resque_worker = options[:resque_worker] || ENV["RESQUE_WORKER"]
     self.redis_url = options[:redis_url] || ENV["REDIS_URL"]
     Resque.redis = Redis.new(:url => redis_url) if resque_configured?

@@ -7,7 +7,8 @@ class DataFetcher
 
   attr_accessor :aws_access_key_id, :aws_secret_access_key,
                 :aws_s3_bucket, :angkor_thom_page_index_path,
-                :data_directory, :resque_queue, :resque_worker
+                :data_directory, :resque_queue, :resque_worker,
+                :redis_url
 
   def initialize(options = {})
     self.aws_access_key_id = options[:aws_access_key_id] || ENV["AWS_ACCESS_KEY_ID"]
@@ -17,12 +18,14 @@ class DataFetcher
     self.angkor_thom_page_index_path = options[:angkor_thom_page_index_path] || DEFAULT_ANGKOR_THOM_PAGE_INDEX_PATH
     self.resque_queue = options[:resque_queue] || ENV["RESQUE_QUEUE_NAME"]
     self.resque_worker = options[:resque_worker] || ENV["RESQUE_WORKER"]
+    self.redis_url = options[:redis_url] || ENV["REDIS_URL"]
+    Resque.redis = Redis.new(:url => redis_url) if resque_configured?
   end
 
   def fetch!
     suggested_filename, results = fetch_angkor_thom!
     results_file(suggested_filename).write(results.to_json)
-    Resque::Job.create(resque_queue, "UserImporter", results) if resque_queue && resque_worker
+    Resque::Job.create(resque_queue, resque_worker, results) if resque_configured?
   end
 
   private
@@ -49,6 +52,10 @@ class DataFetcher
 
   def angkor_thom
     @angkor_thom ||= PhoneNumberMiner::AngkorThom.new
+  end
+
+  def resque_configured?
+    resque_queue && resque_worker && redis_url
   end
 
   def s3

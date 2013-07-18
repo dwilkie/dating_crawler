@@ -87,27 +87,62 @@ describe DataFetcher do
       Timecop.return
     end
 
-    it "should upload the angkor thom page indexes to he configured S3 bucket" do
-      with_vcr { subject.fetch! }
-
-      request(2, :body).should == sample[:angkor_thom][:new_page_indexes]
-      request(2, :url).should == asserted_url(assertions[:angkor_thom][:default_page_indexes_path])
-      request(2, :method).should == :put
-    end
-
-    it "should upload the results to the configured S3 bucket" do
-      with_vcr { subject.fetch! }
-
-      request(3, :body).should == sample[:angkor_thom][:data]
-      request(3, :url).should == asserted_url(asserted_angkor_thom_data_path)
-      request(3, :method).should == :put
-    end
-
-    context "given a resque queue and worker is configured" do
-      it "should create a job with the results" do
+    context "Configured Amazon S3 Bucket" do
+      before do
         with_vcr { subject.fetch! }
+      end
 
-        pending "assert job is queued"
+      context "angkor thom page indexes" do
+        def request(attribute)
+          super(2, attribute)
+        end
+
+        it "should be uploaded" do
+          request(:body).should == sample[:angkor_thom][:new_page_indexes]
+          request(:url).should == asserted_url(assertions[:angkor_thom][:default_page_indexes_path])
+          request(:method).should == :put
+        end
+      end
+
+      context "results" do
+        def request(attribute)
+          super(3, attribute)
+        end
+
+        it "should be uploaded" do
+          request(:body).should == sample[:angkor_thom][:data]
+          request(:url).should == asserted_url(asserted_angkor_thom_data_path)
+          request(:method).should == :put
+        end
+      end
+    end
+
+    context "Resque" do
+      before do
+        with_vcr { subject.fetch! }
+      end
+
+      context "is configured" do
+        subject do
+          DataFetcher.new(
+            :resque_queue => "data_importer_queue",
+            :resque_worker => "DataImporter",
+            :redis_url => "redis://localhost:80/0"
+          )
+        end
+
+        it "should create a job to process the results" do
+          job = ResqueSpec.queues["data_importer_queue"].first
+          job.should_not be_nil
+          job[:class].should == "DataImporter"
+          job[:args].should == [sample[:angkor_thom][:data]]
+        end
+      end
+
+      context "is not configured" do
+        it "should not create any jobs" do
+          ResqueSpec.queues.should be_empty
+        end
       end
     end
 

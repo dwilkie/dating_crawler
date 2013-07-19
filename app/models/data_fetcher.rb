@@ -1,6 +1,7 @@
 class DataFetcher
   require 'phone_number_miner/angkor_thom'
   require 'aws-sdk'
+  require 'resque'
 
   DEFAULT_ANGKOR_THOM_PAGE_INDEX_PATH = "dating_crawler/angkor_thom_page_indexes.json"
   DEFAULT_DATA_DIRECTORY = "dating_crawler/data"

@@ -75,6 +75,14 @@ describe DataFetcher do
       "#{assertions[:default_data_path]}/#{timestamp}_angkor_thom_#{latest_angkor_thom_page}-dara_#{latest_dara_page}.json"
     end
 
+    def fetch_empty_results
+      WebMock.clear_requests!
+      ResqueSpec.reset!
+      angkor_thom.stub(:mine!).and_return({})
+      subject = DataFetcher.new
+      with_vcr { subject.fetch! }
+    end
+
     before do
       Timecop.freeze(Time.now)
       PhoneNumberMiner::AngkorThom.stub(:new).and_return(angkor_thom)
@@ -92,20 +100,32 @@ describe DataFetcher do
         with_vcr { subject.fetch! }
       end
 
-      context "angkor thom page indexes" do
-        def request(attribute)
+      describe "the new angkor thom page indexes" do
+        def request(attribute = nil)
           super(2, attribute)
         end
 
-        it "should be uploaded" do
-          request(:body).should == sample[:angkor_thom][:new_page_indexes]
-          request(:url).should == asserted_url(assertions[:angkor_thom][:default_page_indexes_path])
-          request(:method).should == :put
+        context "given new results" do
+          it "should be uploaded" do
+            request(:body).should == sample[:angkor_thom][:new_page_indexes]
+            request(:url).should == asserted_url(assertions[:angkor_thom][:default_page_indexes_path])
+            request(:method).should == :put
+          end
+        end
+
+        context "given no new results" do
+          before do
+            fetch_empty_results
+          end
+
+          it "should not be uploaded" do
+            request.should be_nil
+          end
         end
       end
 
-      context "results" do
-        def request(attribute)
+      describe "the new results" do
+        def request(attribute = nil)
           super(3, attribute)
         end
 
@@ -113,6 +133,16 @@ describe DataFetcher do
           request(:body).should == sample[:angkor_thom][:data]
           request(:url).should == asserted_url(asserted_angkor_thom_data_path)
           request(:method).should == :put
+        end
+
+        context "empty results" do
+          before do
+            fetch_empty_results
+          end
+
+          it "should not be uploaded" do
+            request.should be_nil
+          end
         end
       end
     end
@@ -123,6 +153,8 @@ describe DataFetcher do
       end
 
       context "is configured" do
+        let(:job) { ResqueSpec.queues["data_importer_queue"].first }
+
         subject do
           DataFetcher.new(
             :resque_queue => "data_importer_queue",
@@ -132,10 +164,19 @@ describe DataFetcher do
         end
 
         it "should create a job to process the results" do
-          job = ResqueSpec.queues["data_importer_queue"].first
           job.should_not be_nil
           job[:class].should == "DataImporter"
           job[:args].should == [sample[:angkor_thom][:data]]
+        end
+
+        context "no new results" do
+          before do
+            fetch_empty_results
+          end
+
+          it "should not create a job to process the results" do
+            ResqueSpec.queues.should be_empty
+          end
         end
       end
 

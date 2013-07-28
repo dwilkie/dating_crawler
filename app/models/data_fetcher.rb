@@ -24,23 +24,53 @@ class DataFetcher
   end
 
   def fetch!
-    suggested_filename, results = fetch_angkor_thom!
-    results_file(suggested_filename).write(results.to_json)
-    Resque::Job.create(resque_queue, resque_worker, results) if resque_configured?
+    fetch_angkor_thom!
+    if results.any?
+      results_file(suggested_results_filename).write(results.to_json)
+      Resque::Job.create(resque_queue, resque_worker, results) if resque_configured?
+    end
   end
 
   private
 
   def fetch_angkor_thom!
-    results = angkor_thom.mine!(angkor_thom_page_indexes["angkor_thom"], angkor_thom_page_indexes["dara"])
-    latest_angkor_thom_page = angkor_thom.latest_angkor_thom_page
-    latest_dara_page = angkor_thom.latest_dara_page
-    new_page_indexes = {
-      "angkor_thom" => latest_angkor_thom_page,
-      "dara" => latest_dara_page
-    }.to_json
-    angkor_thom_page_index_file.write(new_page_indexes)
-    ["angkor_thom_#{latest_angkor_thom_page}-dara_#{latest_dara_page}", results]
+    if angkor_thom_results.any?
+      latest_angkor_thom_page = angkor_thom.latest_angkor_thom_page
+      latest_dara_page = angkor_thom.latest_dara_page
+
+      new_page_indexes = {
+        "angkor_thom" => latest_angkor_thom_page,
+        "dara" => latest_dara_page
+      }.to_json
+
+      angkor_thom_page_index_file.write(new_page_indexes)
+      suggest_angkor_thom_results_filename!(
+        latest_angkor_thom_page, latest_dara_page
+      )
+    end
+  end
+
+  def results
+    angkor_thom_results
+  end
+
+  def suggested_results_filename
+    suggested_angkor_thom_results_filename
+  end
+
+  def angkor_thom_results
+    @angkor_thom_results ||= angkor_thom.mine!(
+      angkor_thom_page_indexes["angkor_thom"],
+      angkor_thom_page_indexes["dara"]
+    )
+  end
+
+  def suggest_angkor_thom_results_filename!(latest_angkor_thom_page, latest_dara_page)
+    @suggested_angkor_thom_results_filename = "angkor_thom_#{latest_angkor_thom_page}-dara_#{latest_dara_page}"
+  end
+
+  def suggested_angkor_thom_results_filename
+    @suggested_angkor_thom_results_filename
   end
 
   def timestamp

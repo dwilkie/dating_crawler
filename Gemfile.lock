@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/dwilkie/phone_number_miner.git
-  revision: 0ec5ef429914a7645d0ab59444c111ba5380b6cb
+  revision: fea06909c4d4eeb5611f1f17998337795d6f5040
   specs:
     phone_number_miner (0.0.1)
       google-transliterate

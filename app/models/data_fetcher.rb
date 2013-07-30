@@ -41,8 +41,8 @@ class DataFetcher
 
   def fetch_angkor_thom!
     if angkor_thom_results.any?
-      latest_angkor_thom_page = angkor_thom.latest_angkor_thom_page
-      latest_dara_page = angkor_thom.latest_dara_page
+      latest_angkor_thom_page = angkor_thom.latest_angkor_thom_page || angkor_thom_page_indexes["angkor_thom"]
+      latest_dara_page = angkor_thom.latest_dara_page || angkor_thom_page_indexes["dara"]
 
       new_page_indexes = {
         "angkor_thom" => latest_angkor_thom_page,

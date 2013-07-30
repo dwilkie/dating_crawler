@@ -11,7 +11,7 @@ describe DataFetcher do
       {
         :angkor_thom => {
           :original_page_indexes => { "angkor_thom" => 300, "dara" => 200 },
-          :new_page_indexes => { "angkor_thom" => 327, "dara" => 206 },
+          :new_page_indexes => { "angkor_thom" => 327, "dara" => 200 },
           :data => {
             "85512345678" => {
               "gender" => "m",
@@ -79,6 +79,8 @@ describe DataFetcher do
       WebMock.clear_requests!
       ResqueSpec.reset!
       angkor_thom.stub(:mine!).and_return({})
+      angkor_thom.stub(:latest_angkor_thom_page).and_return(nil)
+      angkor_thom.stub(:latest_dara_page).and_return(nil)
       subject = DataFetcher.new
       with_vcr { subject.fetch! }
     end
@@ -88,7 +90,7 @@ describe DataFetcher do
       PhoneNumberMiner::AngkorThom.stub(:new).and_return(angkor_thom)
       angkor_thom.stub(:mine!).and_return(sample[:angkor_thom][:data])
       angkor_thom.stub(:latest_angkor_thom_page).and_return(sample[:angkor_thom][:new_page_indexes]["angkor_thom"])
-      angkor_thom.stub(:latest_dara_page).and_return(sample[:angkor_thom][:new_page_indexes]["dara"])
+      angkor_thom.stub(:latest_dara_page).and_return(nil)
     end
 
     after do
@@ -244,7 +246,15 @@ describe DataFetcher do
     context "given there is no file containing angkor thom page indexes on the configured S3 bucket" do
       it "should try to fetch data from phone_number_miner/angkor_thom without using page indexes" do
         angkor_thom.should_receive(:mine!).with(nil, nil)
-        with_vcr(:aws_s3_cassette => "aws_s3_no_object") { subject.fetch! }
+        with_vcr(
+          :aws_s3_cassette => "aws_s3_no_object",
+          :angkor_thom => sample[:angkor_thom].merge(
+            :new_page_indexes => {
+              "dara" => nil,
+              "angkor_thom" => sample[:angkor_thom][:new_page_indexes]["angkor_thom"]
+            }
+          )
+        ) { subject.fetch! }
       end
     end
   end

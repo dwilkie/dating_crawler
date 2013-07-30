@@ -187,6 +187,51 @@ describe DataFetcher do
       end
     end
 
+    context "Gmail" do
+      context "is configured" do
+        let(:gmail_account) { "someone@example.com" }
+        let(:gmail_password) { "secret" }
+        let(:recipient_email) { "recipient@example.com" }
+
+        subject do
+          DataFetcher.new(
+            :gmail_account => gmail_account,
+            :gmail_password => gmail_password,
+            :recipient_email => recipient_email
+          )
+        end
+
+        let(:imap) { double(:imap) }
+        let(:smtp) { double(:smtp) }
+
+        before do
+          imap.stub(:login)
+          smtp.stub(:start).and_yield(smtp)
+          Net::IMAP.stub(:new).and_return(imap)
+          Net::SMTP.stub(:new).and_return(smtp)
+        end
+
+        it "should email the configured recipient notifying them of new results" do
+          imap.should_receive(:login).with(gmail_account, gmail_password)
+          smtp.should_receive(:start).with("someone", gmail_account, gmail_password, "plain")
+          smtp.should_receive(:sendmail).with(anything, gmail_account, [recipient_email])
+          with_vcr { subject.fetch! }
+        end
+
+        context "no new results" do
+          before do
+            fetch_empty_results
+          end
+
+          it "should not send an email" do
+            imap.should_not receive(:login)
+            smtp.should_not_receive(:start)
+            with_vcr { subject.fetch! }
+          end
+        end
+      end
+    end
+
     context "given there is a file containing angkor thom page indexes on the configured S3 bucket" do
       it "should try to fetch data from phone_number_miner/angkor_thom using the stored page indexes" do
         angkor_thom.should_receive(:mine!).with(

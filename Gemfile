@@ -5,6 +5,7 @@ gem 'phone_number_miner', :git => "git://github.com/dwilkie/phone_number_miner.g
 gem 'rake'
 gem 'aws-sdk', '~> 1.0'
 gem 'resque'
+gem 'gmail'
 
 group :test do
   gem 'guard-rspec'

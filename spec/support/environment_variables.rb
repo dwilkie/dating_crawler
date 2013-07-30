@@ -6,5 +6,8 @@ RSpec.configure do |config|
     ENV["RESQUE_QUEUE"] = nil
     ENV["RESQUE_WORKER"] = nil
     ENV["REDIS_URL"] = nil
+    ENV["GMAIL_ACCOUNT"] = nil
+    ENV["GMAIL_PASSWORD"] = nil
+    ENV["RECIPIENT_EMAIL"] = nil
   end
 end

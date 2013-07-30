@@ -2,6 +2,7 @@ class DataFetcher
   require 'phone_number_miner/angkor_thom'
   require 'aws-sdk'
   require 'resque'
+  require 'gmail'
 
   DEFAULT_ANGKOR_THOM_PAGE_INDEX_PATH = "dating_crawler/angkor_thom_page_indexes.json"
   DEFAULT_DATA_DIRECTORY = "dating_crawler/data"
@@ -9,7 +10,8 @@ class DataFetcher
   attr_accessor :aws_access_key_id, :aws_secret_access_key,
                 :aws_s3_bucket, :angkor_thom_page_index_path,
                 :data_directory, :resque_queue, :resque_worker,
-                :redis_url
+                :redis_url, :gmail_account, :gmail_password,
+                :recipient_email
 
   def initialize(options = {})
     self.aws_access_key_id = options[:aws_access_key_id] || ENV["AWS_ACCESS_KEY_ID"]
@@ -20,6 +22,9 @@ class DataFetcher
     self.resque_queue = options[:resque_queue] || ENV["RESQUE_QUEUE"]
     self.resque_worker = options[:resque_worker] || ENV["RESQUE_WORKER"]
     self.redis_url = options[:redis_url] || ENV["REDIS_URL"]
+    self.gmail_account = options[:gmail_account] || ENV["GMAIL_ACCOUNT"]
+    self.gmail_password = options[:gmail_password] || ENV["GMAIL_PASSWORD"]
+    self.recipient_email = options[:recipient_email] || ENV["RECIPIENT_EMAIL"]
     Resque.redis = Redis.new(:url => redis_url) if resque_configured?
   end
 
@@ -28,6 +33,7 @@ class DataFetcher
     if results.any?
       results_file(suggested_results_filename).write(results.to_json)
       Resque::Job.create(resque_queue, resque_worker, results) if resque_configured?
+      email_results! if gmail_configured?
     end
   end
 
@@ -73,6 +79,20 @@ class DataFetcher
     @suggested_angkor_thom_results_filename
   end
 
+  def email_results!
+    recipient = recipient_email
+    number_of_results = results.count
+    email = gmail.compose do
+      to recipient
+      subject "Dating Crawler found #{number_of_results} new potential users"
+    end
+    email.deliver!
+  end
+
+  def gmail
+    @gmail ||= Gmail.connect(gmail_account, gmail_password)
+  end
+
   def timestamp
     Time.now.strftime("%Y-%m-%d-%H-%M")
   end
@@ -87,6 +107,10 @@ class DataFetcher
 
   def resque_configured?
     resque_queue && resque_worker && redis_url
+  end
+
+  def gmail_configured?
+    gmail_account && gmail_password && recipient_email
   end
 
   def s3

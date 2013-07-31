@@ -23,28 +23,31 @@ And then execute:
 
 Configuration can be specified thorugh environment variables. The following environment variables can be used:
 
-    AWS_ACCESS_KEY_ID       # required - your aws access key id
-    AWS_SECRET_ACCESS_KEY   # required - your aws secret access key
-    AWS_S3_BUCKET           # required - the bucket in which to upload the results
-    RACK_ENV=production     # required - specifies your environment
+```ruby
+AWS_ACCESS_KEY_ID       # required - your aws access key id
+AWS_SECRET_ACCESS_KEY   # required - your aws secret access key
+AWS_S3_BUCKET           # required - the bucket in which to upload the results
+RACK_ENV=production     # required - specifies your environment
 
-    GMAIL_ACCOUNT           # optional - the Gmail account to use when sending the results email
-    GMAIL_PASSWORD          # optional - the Gmail password for the account above
-    RECIPIENT_EMAIL         # optional - the recipient of the results email
+GMAIL_ACCOUNT           # optional - the Gmail account to use when sending the results email
+GMAIL_PASSWORD          # optional - the Gmail password for the account above
+RECIPIENT_EMAIL         # optional - the recipient of the results email
 
-    REDIS_URL               # optional - the redis URL to connect to for queuing the Resque job
-    RESQUE_QUEUE            # optional - the resque queue in which to queue the job
-    RESQUE_WORKER           # optional - the resque worker which will run the job
+REDIS_URL               # optional - the redis URL to connect to for queuing the Resque job
+RESQUE_QUEUE            # optional - the resque queue in which to queue the job
+RESQUE_WORKER           # optional - the resque worker which will run the job
+```
 
 ### Passing directly
 
 You can also configure the app by passing the configuration directly. E.g.
 
-    require './app/models/data_fetcher'
+```ruby
+require './app/models/data_fetcher'
+DataFetcher.new.fetch!(configuration)
+```
 
-    DataFetcher.new.fetch!(configuration)
-
-    See: [the source](https://github.com/dwilkie/dating_crawler/blob/master/app/models/data_fetcher.rb) for all available configuration options.
+See: [the source](https://github.com/dwilkie/dating_crawler/blob/master/app/models/data_fetcher.rb) for all available configuration options.
 
 
 ## Usage
@@ -55,9 +58,10 @@ You can also configure the app by passing the configuration directly. E.g.
 
 ### Use it directly
 
-    require './app/models/data_fetcher'
-
-    DataFetcher.new.fetch!(configuration)
+```ruby
+require './app/models/data_fetcher'
+DataFetcher.new.fetch!
+```
 
 ## Deployment
 

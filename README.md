@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.org/dwilkie/dating_crawler.png)](https://travis-ci.org/dwilkie/dating_crawler) [![Dependency Status](https://gemnasium.com/dwilkie/dating_crawler.png)](https://gemnasium.com/dwilkie/dating_crawler) [![Code Climate](https://codeclimate.com/github/dwilkie/dating_crawler.png)](https://codeclimate.com/github/dwilkie/dating_crawler)
 
-
 Crawls the web, mining for phone numbers and metadata of people who are interested in Mobile Dating, then saves the results to your configured S3 Bucket.
 
 Optionally you can have it send an email summarizing the results or queue a Resque job to process the results.
@@ -11,11 +10,15 @@ Optionally you can have it send an email summarizing the results or queue a Resq
 
 Clone the app
 
-    $ git clone https://github.com/dwilkie/dating_crawler.git
+```shell
+$ git clone https://github.com/dwilkie/dating_crawler.git
+```
 
 And then execute:
 
-    $ bundle
+```shell
+$ bundle
+```
 
 ## Configuration
 
@@ -27,7 +30,7 @@ Configuration can be specified thorugh environment variables. The following envi
 AWS_ACCESS_KEY_ID       # required - your aws access key id
 AWS_SECRET_ACCESS_KEY   # required - your aws secret access key
 AWS_S3_BUCKET           # required - the bucket in which to upload the results
-RACK_ENV=production     # required - specifies your environment
+RACK_ENV                # required - specifies your environment. Set to production for deployment
 
 GMAIL_ACCOUNT           # optional - the Gmail account to use when sending the results email
 GMAIL_PASSWORD          # optional - the Gmail password for the account above
@@ -49,12 +52,13 @@ DataFetcher.new.fetch!(configuration)
 
 See: [the source](https://github.com/dwilkie/dating_crawler/blob/master/app/models/data_fetcher.rb) for all available configuration options.
 
-
 ## Usage
 
 ### Rake Task
 
-    $ bundle exec rake data:fetch
+```shell
+$ bundle exec rake data:fetch
+```
 
 ### Use it directly
 
@@ -69,24 +73,34 @@ DataFetcher.new.fetch!
 
 #### Create a Heroku app
 
-    $ heroku create
-    $ git push heroku master
+```shell
+$ heroku create
+$ git push heroku master
+```
 
 #### Configure the required environment variables
 
-    $ heroku config:add AWS_ACCESS_KEY_ID=aws_access_key_id AWS_SECRET_ACCESS_KEY=aws_secret_access_key AWS_S3_BUCKET=aws_s3_bucket RACK_ENV=production
+```shell
+$ heroku config:add AWS_ACCESS_KEY_ID=aws_access_key_id AWS_SECRET_ACCESS_KEY=aws_secret_access_key AWS_S3_BUCKET=aws_s3_bucket RACK_ENV=production
+```
 
 #### Configure Gmail (optional)
 
-    $ heroku config:add GMAIL_ACCOUNT=someone@gmail.com GMAIL_PASSWORD=secret RECIPIENT_EMAIL=someone@example.com
+```shell
+$ heroku config:add GMAIL_ACCOUNT=someone@gmail.com GMAIL_PASSWORD=secret RECIPIENT_EMAIL=someone@example.com
+```
 
 #### Configure Redis (optional)
 
-    $ heroku config:add REDIS_URL=redis_url RESQUE_QUEUE=some_worker_queue RESQUE_WORKER=SomeWorker
+```shell
+$ heroku config:add REDIS_URL=redis_url RESQUE_QUEUE=some_worker_queue RESQUE_WORKER=SomeWorker
+```
 
 #### Run the rake task on Heroku
 
-    $ heroku run rake data:fetch
+```shell
+$ heroku run rake data:fetch
+```
 
 ## Contributing
 
